@@ -17,7 +17,7 @@ namespace FormValidator.assembler
             // Init service & passing params
             googleGeocodingApiService = new GoogleGeocodingApiService(
                 geocodeApiUrl: "https://maps.googleapis.com/maps/api/geocode/", 
-                apiKey: "AIzaSyAp6H0kc1C0ZrWUG1_cy8xJlmTJe4Ewkcs");
+                apiKey: "<your-api-key>");
         }
 
         /**
