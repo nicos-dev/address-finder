@@ -6,6 +6,16 @@
 ## Preview
 ![](https://github.com/nicholas-dietz/address-finder/blob/master/img/preview.gif)
 
+## Google API Key
+[Get API Key](https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en)
+
+### Edit GooglePlacesResponseAssembler.cs
+Navigate to ./AddressFinder/**AddressForm.cs**
+> Insert API-Key (..)
+>```csharp
+>private static protected string apiKey = "<your-api-key>";
+>```
+  
 ## Dependencies
 > [Serilog](https://github.com/serilog/serilog)
 
