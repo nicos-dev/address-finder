@@ -4,7 +4,7 @@
 > C# application where addresses can be found using the Google Places &amp; Geocoding API.
 
 ## Preview
-![](https://github.com/nicholas-dietz/address-finder/blob/master/img/preview.gif)
+![](https://github.com/nicholas-dietz/address-finder/blob/master/img/preview.gif) 
 
 ## Google API Key
 [Get API Key](https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en)
