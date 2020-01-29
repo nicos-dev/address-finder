@@ -17,9 +17,9 @@ namespace FormValidator
         private Logger log;
 
         private static HttpClient client;
-        private static protected String apiKey;
+        private protected String apiKey;
 
-        public GooglePlacesApiService()
+        public GooglePlacesApiService(string apiKey)
         {
             // Log
             log = new LoggerConfiguration()
@@ -29,7 +29,7 @@ namespace FormValidator
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             client = new HttpClient();
-            apiKey = "AIzaSyAp6H0kc1C0ZrWUG1_cy8xJlmTJe4Ewkcs";
+            this.apiKey = apiKey;
         }
 
         private Task<HttpResponseMessage> executeSearchRequest(string searchText)
