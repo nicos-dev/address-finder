@@ -8,7 +8,7 @@
 
 ## Google API Key
 [Get API Key](https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en)
-> **Note:** API must be activated for Google-Places API & Google-Geocoding API
+> **Note:** API-Key must be activated for Google-Places API & Google-Geocoding API
 
 ### Set API-Key
 Navigate to ./AddressFinder/**AddressForm.cs**
