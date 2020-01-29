@@ -17,7 +17,7 @@ namespace FormValidator
         private Logger log;
         
         // API-KEY
-        private static protected string apiKey;
+        private static protected string apiKey = "<your-api-key>";
 
         // DBEOUNCE CLASS
         private DebounceDispatcher debounceTimer;
