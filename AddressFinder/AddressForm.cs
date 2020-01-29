@@ -1,11 +1,12 @@
 ﻿using FormValidator.assembler;
-using FormValidator.interfaces.google.places.response;
-using FormValidator.interfaces.search;
-using Serilog;
-using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using FormValidator.interfaces.google.places.response;
+using FormValidator.interfaces.search;
+using FormValidator.services;
+using Serilog;
+using Serilog.Core;
 
 namespace FormValidator
 {
@@ -14,69 +15,62 @@ namespace FormValidator
     public partial class MainForm : Form
     {
         // LOGGING
-        private Logger log;
+        private readonly Logger _log;
         
         // API-KEY
-        private static protected string apiKey = "<your-api-key>";
+        private static readonly string _apiKey = "<your-api-key";
 
-        // DBEOUNCE CLASS
-        private DebounceDispatcher debounceTimer;
+        // DEBOUNCE CLASS
+        private readonly DebounceDispatcher _debounceDispatcher;
 
         // SERVICES
-        private GooglePlacesApiService googlePlacesApiService;
+        private readonly GooglePlacesApiService _googlePlacesApiService;
 
         // ASSEMBLER
-        private GooglePlacesResponseAssembler googlePlacesResponseAssembler;
+        private readonly GooglePlacesResponseAssembler _googlePlacesResponseAssembler;
 
         // SEARCH PREDICTION
-        private List<SearchSuggestion> searchPredictions; 
+        private List<SearchSuggestion> _searchPredictions; 
 
         // GOOGLE-PLACES RESPONSE
-        private PlacesAutocompleteResponse placesAutocompleteResponse;
+        private PlacesAutocompleteResponse _placesAutocompleteResponse;
 
         // CURRENT DISPLAYED ITEMS IN DROP-DOWN
-        private string[] currentDisplayedPredictions = { };
+        private string[] _currentDisplayedPredictions = { };
 
         // SELECTED DROP-DOWN ITEM
-        private string selectedSearchItem = "";
+        private string _selectedSearchItem = "";
 
         public MainForm()
         {
             InitializeComponent();
 
-            // Style settings
-            this.Size = new System.Drawing.Size(400, 240);
-            comboBoxSearch.Size = new System.Drawing.Size(362, 21);
-            comboBoxSearch.Location = new System.Drawing.Point(13, 6);
-            comboBoxSearch.Items.Insert(0, "Search...");
-            comboBoxSearch.SelectedIndex = 0;
-
-            /**
+            /*
              * INIT Objects
              */
 
             // Log
-            log = new LoggerConfiguration()
+            _log = new LoggerConfiguration()
                 .WriteTo.Console()
                 .MinimumLevel.Debug()
                 .CreateLogger();
 
             // Services
-            googlePlacesApiService = new GooglePlacesApiService(apiKey);
+            _googlePlacesApiService = new GooglePlacesApiService(_apiKey);
 
             // Assembler
-            googlePlacesResponseAssembler = new GooglePlacesResponseAssembler(apiKey);
+            _googlePlacesResponseAssembler = new GooglePlacesResponseAssembler(_apiKey);
 
             // Debounce
-            debounceTimer = new DebounceDispatcher();
+            _debounceDispatcher = new DebounceDispatcher(500);
 
             // Search predictions
-            searchPredictions = new List<SearchSuggestion>();
+            _searchPredictions = new List<SearchSuggestion>();
         }
 
-        private void runSearchRequest(object sender, EventArgs e)
+        private void RunSearchRequest(object sender, EventArgs e)
         {
-            /**
+            /*
              * Debounce needed to prevent executing (updateSearchSuggestions() -triggered by action) every time text is changed.
              * So the Method is only once in 500 ms executable. This prevents the application from 
              * hanging due to outdated requests to the API, this happens because there will be 
@@ -84,31 +78,30 @@ namespace FormValidator
              */
             if (comboBoxSearch.SelectedIndex != 0)
             {
-                debounceTimer.Debounce(500, (p) =>
+                // Start progress-bar
+                progressBarSearch.Visible = true;
+                _debounceDispatcher.Debounce(() =>
                 {
                     try
                     {
                         // Prevents from refresh predictions when item in drop-down selected.
-                        if (!comboBoxSearch.Text.ToLower().Equals(selectedSearchItem.ToLower()))
+                        if (!comboBoxSearch.Text.ToLower().Equals(_selectedSearchItem.ToLower()))
                         {
-                            // Start progress-bar
-                            progressBarSearch.Visible = true;
-                            progressBarSearch.Value = 0;
-
-                            updateSearchSuggestions();
-                            log.Information(String.Format(">UPDATED < Suggestions for [Text]:'{0}'", comboBoxSearch.Text));
+                            UpdateSearchSuggestions();
+                            _log.Information($">UPDATED < Suggestions for [Text]:'{comboBoxSearch.Text}'");
                         }
-                    
+
                     } catch(Exception ex)
                     {
-                        log.Error(String.Format(">FAILED  < [EX]:'{0}' Suggestions for [Text]:'{1}'", ex.GetType().Name, comboBoxSearch.Text));
-                        MessageBox.Show(String.Format("Failed to update suggestions for '{0}'.", comboBoxSearch.Text), String.Format("Adress Finder ({0})", ex.GetType().FullName),
+                        _log.Error(
+                            $">FAILED  < [EX]:'{ex.GetType().Name}' Suggestions for [Text]:'{comboBoxSearch.Text}'");
+                        MessageBox.Show($@"Failed to update suggestions for '{comboBoxSearch.Text}'.",
+                            $@"Address Finder ({ex.GetType().FullName})",
                             MessageBoxButtons.OK, 
                             MessageBoxIcon.Error);
                     } finally
                     {
                         // Reset progress-bar
-                        progressBarSearch.Value = 0;
                         progressBarSearch.Visible = false;
                     }
                 
@@ -122,44 +115,44 @@ namespace FormValidator
          * 
          * -> Executed if user select prediction in search drop-down
          */
-        private void setAddress(object sender, EventArgs e)
+        private void SetAddress(object sender, EventArgs e)
         {
             if (comboBoxSearch.SelectedIndex != 0)
             {
                 // Get selected item from search-drop-down
-                selectedSearchItem = (string)comboBoxSearch.SelectedItem;
+                _selectedSearchItem = (string)comboBoxSearch.SelectedItem;
 
-                log.Information(String.Format(">SELECT  < User selected '{0}' in [Object]: ComboBoxSearch", selectedSearchItem));
+                _log.Information($">SELECT  < User selected '{_selectedSearchItem}' in [Object]: ComboBoxSearch");
 
                 // Iterate through current set search-predictions
-                this.searchPredictions.ForEach(item =>
+                this._searchPredictions.ForEach(item =>
                 {
                     // Search matching item from search-predictions by name set in drop-down
-                    if (String.Format("{0}: {1}, {2}", item.name, item.city, item.country).ToLower().Equals(selectedSearchItem.ToLower()))
+                    if ($"{item.Name}: {item.City}, {item.Country}".ToLower().Equals(_selectedSearchItem.ToLower()))
                     {
 
                         // Set text-box properties
-                        if (item.country != null)
+                        if (item.Country != null)
                         {
-                            textBoxCountry1.Text = item.country;
+                            textBoxCountry1.Text = item.Country;
                         }
-                        if (item.city != null)
+                        if (item.City != null)
                         {
-                            textBoxCity.Text = item.city;
+                            textBoxCity.Text = item.City;
                         }
-                        if (item.postalCode != null)
+                        if (item.PostalCode != null)
                         {
-                            textBoxPostalCode.Text = item.postalCode;
+                            textBoxPostalCode.Text = item.PostalCode;
                         }
-                        if (item.streetName != null)
+                        if (item.StreetName != null)
                         {
-                            textBoxStreetName1.Text = item.streetName;
+                            textBoxStreetName1.Text = item.StreetName;
                         }
-                        if (item.houseNumber != null)
+                        if (item.HouseNumber != null)
                         {
-                            textBoxHouseNumber.Text = item.houseNumber;
+                            textBoxHouseNumber.Text = item.HouseNumber;
                         }
-                        log.Information(String.Format(">FINISHED< Address data set for '{0}'", selectedSearchItem));
+                        _log.Information($">FINISHED< Address data set for '{_selectedSearchItem}'");
                     }
                 });
             } else
@@ -177,51 +170,45 @@ namespace FormValidator
          * UPDATE SEARCH-SUGGESTIONS
          * 
          */
-        private void updateSearchSuggestions()
+        private void UpdateSearchSuggestions()
         {
             // Remove all old suggestions from drop-down
-            this.removeItemsFromSearchDropDown(currentDisplayedPredictions);
+            this.RemoveItemsFromSearchDropDown(_currentDisplayedPredictions);
 
-            progressBarSearch.Value = 40;
-
-            // Execute textsearch request against google-api and deserialize response.
-            placesAutocompleteResponse = googlePlacesApiService.doRequest(this.getSearchText());
+            // Execute text-search request against google-api and deserialize response.
+            _placesAutocompleteResponse = _googlePlacesApiService.DoRequest(this.GetSearchText());
 
             // Convert response to search-suggestion and get further information (geocode)
-            searchPredictions = this.googlePlacesResponseAssembler.convertToSearchSuggestion(placesAutocompleteResponse.results);
-
-            progressBarSearch.Value = 90;
+            _searchPredictions = this._googlePlacesResponseAssembler.ConvertToSearchSuggestion(_placesAutocompleteResponse.results);
 
             // Set new search-suggestions
-            this.setSearchBoxItems(searchPredictionList: searchPredictions);
-
-            progressBarSearch.Value = 100;
+            this.SetSearchBoxItems();
         }
 
         /**
          * SET SEARCH-BOX DROP-DOWN ITEMS
          * 
-         * Sets usefull displayed name in drop-down by geocode information
+         * Sets useful displayed name in drop-down by geocode information
          */
-        private void setSearchBoxItems(List<SearchSuggestion> searchPredictionList)
+        private void SetSearchBoxItems()
         {
             List<string> predictionsList = new List<string>();
-            foreach (var searchPrediction in searchPredictions)
+            foreach (var searchPrediction in _searchPredictions)
             {
-                predictionsList.Add(String.Format("{0}: {1}, {2}", searchPrediction.name, searchPrediction.city, searchPrediction.country));
+                predictionsList.Add($"{searchPrediction.Name}: {searchPrediction.City}, {searchPrediction.Country}");
             }
 
             // Set items displayed in drop-down
             comboBoxSearch.Items.AddRange(predictionsList.ToArray());
 
             // Saves items to be able to check if data changes
-            currentDisplayedPredictions = predictionsList.ToArray();
+            _currentDisplayedPredictions = predictionsList.ToArray();
         }
 
         /**
          * REMOVE ITEMS SET IN DROP-DOWN
          */
-        private void removeItemsFromSearchDropDown(string[] displayedPredictions)
+        private void RemoveItemsFromSearchDropDown(string[] displayedPredictions)
         {
             foreach (var item in displayedPredictions)
             {
@@ -234,7 +221,7 @@ namespace FormValidator
         /**
          * GET THE SEARCH-TEXT ENTERED IN THE SEARCH-FIELD
          */
-        private string getSearchText()
+        private string GetSearchText()
         {
             return comboBoxSearch.Text;
         }

@@ -1,54 +1,55 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using FormValidator.interfaces.google.places.response;
 using Newtonsoft.Json;
-using System.Net;
-using Serilog.Core;
 using Serilog;
+using Serilog.Core;
 
-namespace FormValidator
+namespace FormValidator.services
 {
 
     class GooglePlacesApiService
     {
 
         // LOGGING
-        private Logger log;
+        private readonly Logger _log;
 
-        private static HttpClient client;
-        private protected String apiKey;
+        private static HttpClient _client;
+        private readonly String _apiKey;
 
         public GooglePlacesApiService(string apiKey)
         {
             // Log
-            log = new LoggerConfiguration()
+            _log = new LoggerConfiguration()
                 .WriteTo.Console()
                 .MinimumLevel.Debug()
                 .CreateLogger();
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            client = new HttpClient();
-            this.apiKey = apiKey;
+            _client = new HttpClient();
+            this._apiKey = apiKey;
         }
 
-        private Task<HttpResponseMessage> executeSearchRequest(string searchText)
+        private Task<HttpResponseMessage> ExecuteSearchRequest(string searchText)
         {
-            return client.GetAsync(string.Format("https://maps.googleapis.com/maps/api/place/textsearch/json?query={0}&key={1}", searchText, apiKey));
+            return _client.GetAsync(
+                $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={searchText}&key={_apiKey}");
         }
 
 
-        private PlacesAutocompleteResponse deserializeJsonToPAR(string json)
+        private PlacesAutocompleteResponse DeserializeJsonToPar(string json)
         {
             try
             {
                 PlacesAutocompleteResponse placesAutocompleteResponse = JsonConvert.DeserializeObject<PlacesAutocompleteResponse>(json);
-                log.Debug(">FINISHED< Convert Google-Places response");
+                _log.Debug(">FINISHED< Convert Google-Places response");
                 return placesAutocompleteResponse;
-            } catch (Exception ex)
+            } catch (Exception)
             {
-                log.Debug(">FAILED  < Convert Google-Places response");
-                throw ex;
+                _log.Debug(">FAILED  < Convert Google-Places response");
+                throw;
             }
             
         }
@@ -56,33 +57,33 @@ namespace FormValidator
         /**
          * EXECUTE REQUEST AND WAIT FOR RESPONSE
          */
-        private Task<HttpResponseMessage> executePlacesRequest(string searchText)
+        private Task<HttpResponseMessage> ExecutePlacesRequest(string searchText)
         {
             try
             {
-                Task<HttpResponseMessage> taskRequest = this.executeSearchRequest(searchText);
+                Task<HttpResponseMessage> taskRequest = this.ExecuteSearchRequest(searchText);
                 this.waitForTaskToFinish(taskRequest);
-                log.Information(String.Format(">FINISHED< Google-Places request for [Text]:'{0}'", searchText));
+                _log.Information($">FINISHED< Google-Places request for [Text]:'{searchText}'");
                 return taskRequest;
-            } catch(Exception ex)
+            } catch(Exception)
             {
-                log.Error(String.Format(">FAILED  < Google-Places request for [Text]:'{0}'", searchText));
-                throw ex;
+                _log.Error($">FAILED  < Google-Places request for [Text]:'{searchText}'");
+                throw;
             }
         }
 
-        private string readResponseContent(Task<HttpResponseMessage> task)
+        private string ReadResponseContent(Task<HttpResponseMessage> task)
         {
             try
             {
                 Task<string> taskReadStream = task.Result.Content.ReadAsStringAsync();
                 this.waitForTaskToFinish(taskReadStream);
-                log.Debug(">FINISHED< Read content of Google-Places request");
+                _log.Debug(">FINISHED< Read content of Google-Places request");
                 return taskReadStream.Result;
-            } catch(Exception ex)
+            } catch(Exception)
             {
-                log.Error(">FAILED  < Read content of Google-Geocode request");
-                throw ex;
+                _log.Error(">FAILED  < Read content of Google-Geocode request");
+                throw;
             }
             
         }
@@ -92,21 +93,21 @@ namespace FormValidator
             task.Wait();
         }
 
-        public PlacesAutocompleteResponse doRequest(string searchText)
+        public PlacesAutocompleteResponse DoRequest(string searchText)
         {
             try
             {
-                PlacesAutocompleteResponse placesAutocompleteResponse = this.deserializeJsonToPAR(
-                    this.readResponseContent(
-                            this.executePlacesRequest(searchText)
+                PlacesAutocompleteResponse placesAutocompleteResponse = this.DeserializeJsonToPar(
+                    this.ReadResponseContent(
+                            this.ExecutePlacesRequest(searchText)
                         )
                     );
-                log.Information(String.Format(">FINISHED< Get Google-Places information for [Text]:'{0}'", searchText));
+                _log.Information($">FINISHED< Get Google-Places information for [Text]:'{searchText}'");
                 return placesAutocompleteResponse;
-            } catch(Exception ex)
+            } catch(Exception)
             {
-                log.Error(String.Format(">FAILED  < Get Google-Places information for [Text]:'{0}'", searchText));
-                throw ex;
+                _log.Error($">FAILED  < Get Google-Places information for [Text]:'{searchText}'");
+                throw;
             }
             
         }

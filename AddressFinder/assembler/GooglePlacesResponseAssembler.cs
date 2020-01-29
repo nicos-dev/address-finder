@@ -1,21 +1,21 @@
 ﻿using FormValidator.interfaces.google.geocode.response;
-using FormValidator.interfaces.google.places.response.prediction;
-using FormValidator.interfaces.search;
 using FormValidator.services;
 using System.Collections.Generic;
 using System.Linq;
+using FormValidator.interfaces.google.places.response.suggestion;
+using FormValidator.interfaces.search;
 
 namespace FormValidator.assembler
 {
     class GooglePlacesResponseAssembler
     {
         // Services
-        GoogleGeocodingApiService googleGeocodingApiService;
+        readonly GoogleGeocodingApiService _googleGeocodingApiService;
 
         public GooglePlacesResponseAssembler(string apiKey)
         {
             // Init service & passing params
-            googleGeocodingApiService = new GoogleGeocodingApiService(
+            _googleGeocodingApiService = new GoogleGeocodingApiService(
                 geocodeApiUrl: "https://maps.googleapis.com/maps/api/geocode/", 
                 apiKey: apiKey);
         }
@@ -24,7 +24,7 @@ namespace FormValidator.assembler
          * CONVERTS GOOGLE-PLACES RESPONSE TO SEARCH-SUGGESTION INCLUDING MORE DETAILS
          * 
          */
-        public List<SearchSuggestion> convertToSearchSuggestion(PlacesAutocompleteResponsePrediction[] predictions)
+        public List<SearchSuggestion> ConvertToSearchSuggestion(PlacesAutocompleteResponsePrediction[] predictions)
         {
 
             List<SearchSuggestion> searchPredictionList = new List<SearchSuggestion>();
@@ -33,61 +33,61 @@ namespace FormValidator.assembler
             foreach (var prediction in predictions)
             {
                 // Init new SearchSuggestion for each item in list
-                SearchSuggestion searchPrediction = new SearchSuggestion();
+                SearchSuggestion searchPrediction = new SearchSuggestion
+                {
+                    Name = prediction.name, PlaceId = prediction.place_id, Types = prediction.types
+                };
 
                 // Set information from google-places-api
-                searchPrediction.name = prediction.name;
-                searchPrediction.place_id = prediction.place_id;
-                searchPrediction.types = prediction.types;
 
-                // Request Google-Geocode-API (get geocode informations by Place-ID)
-                GeocodeResponse geocodeResponse = googleGeocodingApiService.doRequest(place_id: prediction.place_id);
+                // Request Google-Geocode-API (get geocode information by Place-ID)
+                GeocodeResponse geocodeResponse = _googleGeocodingApiService.DoRequest(placeId: prediction.place_id);
 
                 // Check if response contains information about Place-ID
-                if (geocodeResponse.results.Where(geocode => geocode.place_id == prediction.place_id).Any())
+                if (geocodeResponse.results.Any(geocode => geocode.place_id == prediction.place_id))
                 {
                     // Get first matching result
-                    GeocodeResponseResults geocodeFound = geocodeResponse.results.Where(geocode => geocode.place_id == prediction.place_id).First();
+                    GeocodeResponseResults geocodeFound = geocodeResponse.results.First(geocode => geocode.place_id == prediction.place_id);
 
-                    /**
+                    /*
                      * Set properties
                      * 
                      * Information found?
                      *  -> true (set property)
                      *  -> false (set property to empty string)
                      */
-                    searchPrediction.formatted_address = geocodeFound.formatted_address;
+                    searchPrediction.FormattedAddress = geocodeFound.formatted_address;
 
-                    searchPrediction.streetName = geocodeFound.address_components.Where(address => address.types.Contains("route")).Any()
-                                            ? geocodeFound.address_components.Where(address => address.types.Contains("route")).First().long_name
-                                            : "";
+                    searchPrediction.StreetName = geocodeFound.address_components.Any(address => address.types.Contains("route"))
+                        ? geocodeFound.address_components.First(address => address.types.Contains("route")).long_name
+                        : "";
 
-                    searchPrediction.houseNumber = geocodeFound.address_components.Where(address => address.types.Contains("street_number")).Any()
-                                            ? geocodeFound.address_components.Where(address => address.types.Contains("street_number")).First().long_name
-                                            : "";
+                    searchPrediction.HouseNumber = geocodeFound.address_components.Any(address => address.types.Contains("street_number"))
+                        ? geocodeFound.address_components.First(address => address.types.Contains("street_number")).long_name
+                        : "";
 
-                    searchPrediction.city = geocodeFound.address_components.Where(address => address.types.Contains("locality")).Any()
-                                            ? geocodeFound.address_components.Where(address => address.types.Contains("locality")).First().long_name
-                                            : "";
+                    searchPrediction.City = geocodeFound.address_components.Any(address => address.types.Contains("locality"))
+                        ? geocodeFound.address_components.First(address => address.types.Contains("locality")).long_name
+                        : "";
 
-                    searchPrediction.postalCode = geocodeFound.address_components.Where(address => address.types.Contains("postal_code")).Any()
-                                            ? geocodeFound.address_components.Where(address => address.types.Contains("postal_code")).First().long_name
-                                            : "";
+                    searchPrediction.PostalCode = geocodeFound.address_components.Any(address => address.types.Contains("postal_code"))
+                        ? geocodeFound.address_components.First(address => address.types.Contains("postal_code")).long_name
+                        : "";
 
-                    searchPrediction.country = geocodeFound.address_components.Where(address => address.types.Contains("country")).Any()
-                        ? geocodeFound.address_components.Where(address => address.types.Contains("country")).First().long_name
+                    searchPrediction.Country = geocodeFound.address_components.Any(address => address.types.Contains("country"))
+                        ? geocodeFound.address_components.First(address => address.types.Contains("country")).long_name
                         : "";
                     
 
                 } else
                 {
-                    // If no further information about place exists propertys set to empty string
-                    searchPrediction.formatted_address = "";
-                    searchPrediction.streetName = "";
-                    searchPrediction.houseNumber = "";
-                    searchPrediction.city = "";
-                    searchPrediction.postalCode = "";
-                    searchPrediction.country = "";
+                    // If no further information about place exists properties set to empty string
+                    searchPrediction.FormattedAddress = "";
+                    searchPrediction.StreetName = "";
+                    searchPrediction.HouseNumber = "";
+                    searchPrediction.City = "";
+                    searchPrediction.PostalCode = "";
+                    searchPrediction.Country = "";
                     
                 }
 

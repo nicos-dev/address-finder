@@ -1,6 +1,6 @@
-﻿using System;
+﻿﻿using System;
 
-namespace FormValidator.interfaces.google.places.response.prediction
+ namespace FormValidator.interfaces.google.places.response.suggestion
 {
     /**
      * Object is used to deserialize response from Google-Places-API

@@ -4,7 +4,6 @@
     /**
      * Object is used to deserialize response from Google-Geocode-API
      */
-
     class GeocodeResponseAddressComponent
     {
         /**

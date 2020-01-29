@@ -118,8 +118,11 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>7, 15</value>
+  </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>384, 196</value>
+    <value>448, 226</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="textBoxCountry1.Enabled" type="System.Boolean, mscorlib">
@@ -129,60 +132,109 @@
     <value>Arial, 10pt</value>
   </data>
   <data name="textBoxCountry1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>150, 170</value>
+    <value>175, 196</value>
+  </data>
+  <data name="textBoxCountry1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>262, 16</value>
+  </data>
+  <data name="comboBoxSearch.ItemHeight" type="System.Int32, mscorlib">
+    <value>15</value>
   </data>
   <data name="comboBoxSearch.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 6</value>
+    <value>15, 7</value>
   </data>
   <data name="comboBoxSearch.Size" type="System.Drawing.Size, System.Drawing">
-    <value>362, 21</value>
+    <value>422, 23</value>
   </data>
   <data name="labelCountry.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt, style=Bold</value>
   </data>
+  <data name="labelCountry.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 197</value>
+  </data>
+  <data name="labelCountry.Size" type="System.Drawing.Size, System.Drawing">
+    <value>117, 27</value>
+  </data>
   <data name="progressBarSearch.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 33</value>
+    <value>15, 38</value>
   </data>
   <data name="progressBarSearch.Size" type="System.Drawing.Size, System.Drawing">
-    <value>362, 10</value>
+    <value>422, 12</value>
   </data>
   <data name="textBoxPostalCode.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt</value>
   </data>
   <data name="textBoxPostalCode.Location" type="System.Drawing.Point, System.Drawing">
-    <value>150, 140</value>
+    <value>175, 162</value>
+  </data>
+  <data name="textBoxPostalCode.Size" type="System.Drawing.Size, System.Drawing">
+    <value>262, 16</value>
   </data>
   <data name="labelPostalCode.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt, style=Bold</value>
   </data>
+  <data name="labelPostalCode.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 163</value>
+  </data>
+  <data name="labelPostalCode.Size" type="System.Drawing.Size, System.Drawing">
+    <value>117, 27</value>
+  </data>
   <data name="labelCity.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt, style=Bold</value>
+  </data>
+  <data name="labelCity.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 128</value>
+  </data>
+  <data name="labelCity.Size" type="System.Drawing.Size, System.Drawing">
+    <value>117, 27</value>
   </data>
   <data name="labelHouseNumber.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt, style=Bold</value>
   </data>
+  <data name="labelHouseNumber.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 93</value>
+  </data>
   <data name="labelHouseNumber.Size" type="System.Drawing.Size, System.Drawing">
-    <value>117, 23</value>
+    <value>136, 27</value>
   </data>
   <data name="textBoxCity.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt</value>
   </data>
   <data name="textBoxCity.Location" type="System.Drawing.Point, System.Drawing">
-    <value>150, 110</value>
+    <value>175, 127</value>
+  </data>
+  <data name="textBoxCity.Size" type="System.Drawing.Size, System.Drawing">
+    <value>262, 16</value>
   </data>
   <data name="textBoxHouseNumber.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt</value>
   </data>
   <data name="textBoxHouseNumber.Location" type="System.Drawing.Point, System.Drawing">
-    <value>150, 80</value>
+    <value>175, 92</value>
+  </data>
+  <data name="textBoxHouseNumber.Size" type="System.Drawing.Size, System.Drawing">
+    <value>175, 16</value>
   </data>
   <data name="labelStreetName.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt, style=Bold</value>
+  </data>
+  <data name="labelStreetName.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 59</value>
+  </data>
+  <data name="labelStreetName.Size" type="System.Drawing.Size, System.Drawing">
+    <value>117, 27</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="$this.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>12, 12, 12, 12</value>
   </data>
   <data name="textBoxStreetName1.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 10pt</value>
   </data>
   <data name="textBoxStreetName1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>150, 50</value>
+    <value>175, 58</value>
+  </data>
+  <data name="textBoxStreetName1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>262, 16</value>
   </data>
 </root>

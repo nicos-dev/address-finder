@@ -1,5 +1,5 @@
 ﻿using System;
-using FormValidator.interfaces.google.places.response.prediction;
+using FormValidator.interfaces.google.places.response.suggestion;
 
 namespace FormValidator.interfaces.google.places.response
 {

@@ -4,7 +4,6 @@
     /**
      * Object is used to deserialize response from Google-Geocode-API
      */
-
     class GeocodeResponseResults
     {
         // Address formatted by google // TODO use for displayed drop-down-tiles
