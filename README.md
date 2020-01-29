@@ -17,7 +17,3 @@ Navigate to ./AddressFinder/**AddressForm.cs**
   
 ## Dependencies
 > [Serilog](https://github.com/serilog/serilog)
-
-## Copyright notice
-DebounceDispatcher.cs licenced under MIT:
-> Rick Strahl © West Wind Technologies, 2017 http://www.west-wind.com/
