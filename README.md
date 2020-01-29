@@ -9,7 +9,7 @@
 ## Google API Key
 [Get API Key](https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en)
 
-### Edit GooglePlacesResponseAssembler.cs
+### Set API-Key
 Navigate to ./AddressFinder/**AddressForm.cs**
 > Insert API-Key (..)
 >```csharp
