@@ -11,7 +11,6 @@
 
 ### Set API-Key
 Navigate to ./AddressFinder/**AddressForm.cs**
-> Insert API-Key (..)
 >```csharp
 >private static protected string apiKey = "<your-api-key>";
 >```
