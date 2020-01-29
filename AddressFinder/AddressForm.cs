@@ -15,6 +15,9 @@ namespace FormValidator
     {
         // LOGGING
         private Logger log;
+        
+        // API-KEY
+        private static protected string apiKey;
 
         // DBEOUNCE CLASS
         private DebounceDispatcher debounceTimer;
@@ -59,10 +62,10 @@ namespace FormValidator
                 .CreateLogger();
 
             // Services
-            googlePlacesApiService = new GooglePlacesApiService();
+            googlePlacesApiService = new GooglePlacesApiService(apiKey);
 
             // Assembler
-            googlePlacesResponseAssembler = new GooglePlacesResponseAssembler();
+            googlePlacesResponseAssembler = new GooglePlacesResponseAssembler(apiKey);
 
             // Debounce
             debounceTimer = new DebounceDispatcher();
