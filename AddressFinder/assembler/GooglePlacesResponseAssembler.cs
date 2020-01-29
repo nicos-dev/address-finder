@@ -12,12 +12,12 @@ namespace FormValidator.assembler
         // Services
         GoogleGeocodingApiService googleGeocodingApiService;
 
-        public GooglePlacesResponseAssembler()
+        public GooglePlacesResponseAssembler(string apiKey)
         {
             // Init service & passing params
             googleGeocodingApiService = new GoogleGeocodingApiService(
                 geocodeApiUrl: "https://maps.googleapis.com/maps/api/geocode/", 
-                apiKey: "<your-api-key>");
+                apiKey: apiKey);
         }
 
         /**
