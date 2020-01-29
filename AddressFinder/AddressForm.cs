@@ -18,7 +18,7 @@ namespace FormValidator
         private readonly Logger _log;
         
         // API-KEY
-        private static readonly string _apiKey = "<your-api-key";
+        private static readonly string _apiKey = "AIzaSyDmcuJIukfwC8DpNUM5McIMYGUfAszZVAw";
 
         // DEBOUNCE CLASS
         private readonly DebounceDispatcher _debounceDispatcher;
