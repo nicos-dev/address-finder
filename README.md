@@ -8,6 +8,7 @@
 
 ## Google API Key
 [Get API Key](https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en)
+> **Note:** API must be activated for Google-Places API & Google-Geocoding API
 
 ### Set API-Key
 Navigate to ./AddressFinder/**AddressForm.cs**
@@ -16,4 +17,5 @@ Navigate to ./AddressFinder/**AddressForm.cs**
 >```
   
 ## Dependencies
-> [Serilog](https://github.com/serilog/serilog)
+- [Serilog](https://github.com/serilog/serilog)
+- [Newtonsoft](https://github.com/JamesNK/Newtonsoft.Json)
