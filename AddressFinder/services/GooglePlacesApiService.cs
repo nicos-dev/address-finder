@@ -9,41 +9,72 @@ using Serilog.Core;
 
 namespace FormValidator.services
 {
-
-    class GooglePlacesApiService
+    public class GooglePlacesApiService
     {
+        
+        #region -- member variables --
 
-        // LOGGING
         private readonly Logger _log;
-
         private static HttpClient _client;
-        private readonly String _apiKey;
+        private readonly string _placesApiUrl;
+        
+        /**
+         * API keys are a simple encrypted string that can be used when calling certain APIs 
+         * that don't need to access private user data. The API key 
+         * is used to track API requests associated with project for quota and billing.
+         * 
+         *  -> Keep this key private!
+         */
+        private readonly string _apiKey;
 
-        public GooglePlacesApiService(string apiKey)
-        {
-            // Log
-            _log = new LoggerConfiguration()
-                .WriteTo.Console()
-                .MinimumLevel.Debug()
-                .CreateLogger();
+        #endregion
 
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            _client = new HttpClient();
-            this._apiKey = apiKey;
-        }
+        #region -- constructor --
 
+        /// <summary>
+        /// Constructor of GooglePlacesApiService
+        /// </summary>
+        /// <param name="placesApiUrl">Url where Google Places API is available</param>
+        /// <param name="apiKey">API-Key generated and Places API is activated</param>
+        public GooglePlacesApiService(string placesApiUrl, string apiKey)
+                {
+                    _log = new LoggerConfiguration()
+                        .WriteTo.Console()
+                        .MinimumLevel.Debug()
+                        .CreateLogger();
+        
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                    _client = new HttpClient();
+                    this._placesApiUrl = placesApiUrl;
+                    this._apiKey = apiKey;
+                }
+        
+        #endregion
+
+        #region -- private methods --
+
+        /// <summary>
+        /// Execute request with Http-Client
+        /// </summary>
+        /// <param name="searchText">Text to search for</param>
+        /// <returns>Unfinished task of request</returns>
         private Task<HttpResponseMessage> ExecuteSearchRequest(string searchText)
         {
             return _client.GetAsync(
-                $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={searchText}&key={_apiKey}");
+                $"{_placesApiUrl}json?query={searchText}&key={_apiKey}");
         }
 
 
+        /// <summary>
+        /// Deserialize JSON Response to Object 
+        /// </summary>
+        /// <param name="json">JSON-String (Response-Body)</param>
+        /// <returns>Created object based on JSON data</returns>
         private PlacesAutocompleteResponse DeserializeJsonToPar(string json)
         {
             try
             {
-                PlacesAutocompleteResponse placesAutocompleteResponse = JsonConvert.DeserializeObject<PlacesAutocompleteResponse>(json);
+                var placesAutocompleteResponse = JsonConvert.DeserializeObject<PlacesAutocompleteResponse>(json);
                 _log.Debug(">FINISHED< Convert Google-Places response");
                 return placesAutocompleteResponse;
             } catch (Exception)
@@ -54,15 +85,17 @@ namespace FormValidator.services
             
         }
 
-        /**
-         * EXECUTE REQUEST AND WAIT FOR RESPONSE
-         */
+        /// <summary>
+        /// Execute request and wait until task finished
+        /// </summary>
+        /// <param name="searchText">Text to search for</param>
+        /// <returns>Finished task of request</returns>
         private Task<HttpResponseMessage> ExecutePlacesRequest(string searchText)
         {
             try
             {
-                Task<HttpResponseMessage> taskRequest = this.ExecuteSearchRequest(searchText);
-                this.waitForTaskToFinish(taskRequest);
+                var taskRequest = this.ExecuteSearchRequest(searchText);
+                WaitForTaskToFinish(taskRequest);
                 _log.Information($">FINISHED< Google-Places request for [Text]:'{searchText}'");
                 return taskRequest;
             } catch(Exception)
@@ -72,12 +105,17 @@ namespace FormValidator.services
             }
         }
 
+        /// <summary>
+        /// Read Response Body JSON-String
+        /// </summary>
+        /// <param name="task">Finished task of request</param>
+        /// <returns>JSON-String</returns>
         private string ReadResponseContent(Task<HttpResponseMessage> task)
         {
             try
             {
-                Task<string> taskReadStream = task.Result.Content.ReadAsStringAsync();
-                this.waitForTaskToFinish(taskReadStream);
+                var taskReadStream = task.Result.Content.ReadAsStringAsync();
+                WaitForTaskToFinish(taskReadStream);
                 _log.Debug(">FINISHED< Read content of Google-Places request");
                 return taskReadStream.Result;
             } catch(Exception)
@@ -88,16 +126,32 @@ namespace FormValidator.services
             
         }
 
-        private void waitForTaskToFinish(Task task)
+        /// <summary>
+        /// Wait until task finished
+        /// </summary>
+        /// <param name="task">Task to wait for finish</param>
+        private static void WaitForTaskToFinish(Task task)
         {
             task.Wait();
         }
+        
+        #endregion
 
+        #region -- public methods --
+
+        /// <summary>
+        /// Do request
+        ///  > Execute Request
+        ///  > Read response content
+        ///  > Deserialize object
+        /// </summary>
+        /// <param name="searchText">Text to search for</param>
+        /// <returns>Object based on response data</returns>
         public PlacesAutocompleteResponse DoRequest(string searchText)
         {
             try
             {
-                PlacesAutocompleteResponse placesAutocompleteResponse = this.DeserializeJsonToPar(
+                var placesAutocompleteResponse = this.DeserializeJsonToPar(
                     this.ReadResponseContent(
                             this.ExecutePlacesRequest(searchText)
                         )
@@ -111,6 +165,8 @@ namespace FormValidator.services
             }
             
         }
+
+        #endregion
 
     }
 }

@@ -9,12 +9,16 @@ using System.Threading.Tasks;
 
 namespace FormValidator.services
 {
-    class GoogleGeocodingApiService
+    /// <summary>
+    /// Service used to get geocoding information about a Google Place (Place-ID)
+    /// </summary>
+    public class GoogleGeocodingApiService
     {
 
-        // LOGGING
-        private readonly Logger _log;
+        #region -- member variables --
 
+        private readonly Logger _log;
+        
         private static HttpClient _client;
 
         /**
@@ -28,6 +32,14 @@ namespace FormValidator.services
 
         private readonly string _geocodeApiUrl;
 
+        #endregion
+        
+        # region -- constructor --
+        /// <summary>
+        /// Constructor of GoogleGeocodingApiService
+        /// </summary>
+        /// <param name="geocodeApiUrl">Url where Google Geocoding API is available</param>
+        /// <param name="apiKey">API-Key generated and Geocoding API is activated</param>
         public GoogleGeocodingApiService(string geocodeApiUrl, string apiKey)
         {
             // Log
@@ -41,25 +53,30 @@ namespace FormValidator.services
             this._geocodeApiUrl = geocodeApiUrl;
             this._apiKey = apiKey;
         }
-        
-        /**
-         * EXECUTE REQUEST
-         */
+        #endregion
+
+        #region -- private methods --
+
+        /// <summary>
+        /// Execute request with Http-Client
+        /// </summary>
+        /// <param name="placeId">Unique Place-ID given by Google</param>
+        /// <returns>Unfinished task of request</returns>
         private Task<HttpResponseMessage> ExecutePlaceIdHrGeocodeRequest(string placeId)
         {
             return _client.GetAsync($"{_geocodeApiUrl}json?place_id={placeId}&key={_apiKey}");
         }
 
-        /**
-         * DESERIALIZE JSON TO GRA (Geocode-Response-Array)
-         * 
-         * @param json Json string to deserialize
-         */
-        private GeocodeResponse DeserializeJsonToGra(string json)
+        /// <summary>
+        /// Deserialize JSON Response to Object 
+        /// </summary>
+        /// <param name="json">JSON-String (Response-Body)</param>
+        /// <returns>Created object based on JSON data</returns>
+        private GeocodeResponse DeserializeJsonToGr(string json)
         {
             try
             {
-                GeocodeResponse geocodeResponse = JsonConvert.DeserializeObject<GeocodeResponse>(json);
+                var geocodeResponse = JsonConvert.DeserializeObject<GeocodeResponse>(json);
                 _log.Debug(">FINISHED< Convert Google-Geocode response");
                 return geocodeResponse;
             } catch(Exception)
@@ -70,14 +87,16 @@ namespace FormValidator.services
             
         }
 
-        /**
-         * EXECUTE REQUEST AND WAIT FOR RESPONSE
-         */
+        /// <summary>
+        /// Execute request and wait until task finished
+        /// </summary>
+        /// <param name="placeId">Unique Place-ID given by Google</param>
+        /// <returns>Finished Task of Request</returns>
         private Task<HttpResponseMessage> ExecuteGeocodingRequest(string placeId)
         {
             try
             {
-                Task<HttpResponseMessage> taskRequest = this.ExecutePlaceIdHrGeocodeRequest(placeId);
+                var taskRequest = this.ExecutePlaceIdHrGeocodeRequest(placeId);
                 WaitForTaskToFinish(taskRequest);
                 _log.Information($">FINISHED< Google-Geocode request for [Place-ID]:'{placeId}'");
                 return taskRequest;
@@ -88,14 +107,16 @@ namespace FormValidator.services
             }
         }
 
-        /**
-         * READ RESPONSE CONTENT
-         */
+        /// <summary>
+        /// Read Response Body JSON-String
+        /// </summary>
+        /// <param name="task">Finished task of request</param>
+        /// <returns>JSON-String</returns>
         private string ReadResponseContent(Task<HttpResponseMessage> task)
         {
             try
             {
-                Task<string> taskReadStream = task.Result.Content.ReadAsStringAsync();
+                var taskReadStream = task.Result.Content.ReadAsStringAsync();
                 WaitForTaskToFinish(taskReadStream);
                 _log.Debug(">FINISHED< Read content of Google-Geocode request");
                 return taskReadStream.Result;
@@ -107,32 +128,46 @@ namespace FormValidator.services
             
         }
 
+        /// <summary>
+        /// Wait until task finished
+        /// </summary>
+        /// <param name="task">Task to wait for finish</param>
         private static void WaitForTaskToFinish(Task task)
         {
             task.Wait();
         }
+        
+        #endregion
 
-        /**
-         * EXECUTE REQUEST AND DESERIALIZE RESPONSE CONTENT
-         */
+        #region -- public methods --
+
+        /// <summary>
+        /// Do request
+        ///  > Execute Request
+        ///  > Read response content
+        ///  > Deserialize object
+        /// </summary>
+        /// <param name="placeId">Unique Place-ID given by Google</param>
+        /// <returns>Object based on response data</returns>
         public GeocodeResponse DoRequest(string placeId)
         {
             try
             {
-                GeocodeResponse geocodeResponse = this.DeserializeJsonToGra(
+                var geocodeResponse = this.DeserializeJsonToGr(
                     this.ReadResponseContent(
                             this.ExecuteGeocodingRequest(placeId)
                         )
                     );
                 _log.Information($">FINISHED< Get Google-Geocode information for [Place-ID]:'{placeId}'");
                 return geocodeResponse;
-            } catch(Exception ex)
+            } catch(Exception)
             {
                 _log.Error($">FAILED  < Get Google-Geocode information for [Place-ID]:'{placeId}'");
                 throw;
             }
 
         }
-
+        #endregion
+        
     }
 }

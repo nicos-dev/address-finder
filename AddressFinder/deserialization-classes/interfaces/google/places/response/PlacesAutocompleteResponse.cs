@@ -1,17 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using FormValidator.interfaces.google.places.response.suggestion;
 
 namespace FormValidator.interfaces.google.places.response
 {
-    /**
-     * Object used to deserialize response from Google-Places-API
-     */
-    class PlacesAutocompleteResponse
+
+    /// <summary>
+    /// Object used to deserialize Google Places response data.
+    /// </summary>
+    public class PlacesAutocompleteResponse
     {
-        // Request-Status returned from google-api
-        public String status { get; set; }
-        
-        // Search Results
-        public PlacesAutocompleteResponsePrediction[] results { get; set; }
+        public string status { get; set; }
+        public PlacesAutocompleteResponseSuggestion[] results { get; set; }
     }
 }

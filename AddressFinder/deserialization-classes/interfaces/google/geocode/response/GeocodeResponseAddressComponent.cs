@@ -1,10 +1,10 @@
 ﻿namespace FormValidator.interfaces.google.geocode.response
 {
 
-    /**
-     * Object is used to deserialize response from Google-Geocode-API
-     */
-    class GeocodeResponseAddressComponent
+    /// <summary>
+    /// Object used to deserialize Google Geocoding response data.
+    /// </summary>
+    public class GeocodeResponseAddressComponent
     {
         /**
          * Example
@@ -13,10 +13,10 @@
          *      types: ["country",...]
          */
 
-        public string long_name;
+        public string long_name { get; set; }
 
-        public string short_name;
+        public string short_name { get; set; }
 
-        public string[] types;
+        public string[] types { get; set; }
     }
 }

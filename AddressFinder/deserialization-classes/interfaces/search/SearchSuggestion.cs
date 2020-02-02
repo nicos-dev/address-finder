@@ -1,11 +1,9 @@
 ﻿namespace FormValidator.interfaces.search
 {
-
-    /**
-     * Used to save data from Google Places & Geocode in one object.
-     */
-
-    class SearchSuggestion
+    /// <summary>
+    /// Used to save data from Google Places & Geocode in one object.
+    /// </summary>
+    public class SearchSuggestion
     {
         public string PlaceId { get; set; }
         public string Name { get; set; }

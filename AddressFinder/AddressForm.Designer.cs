@@ -99,7 +99,6 @@ namespace FormValidator
                 ((int) (resources.GetObject("textBoxCity.IconPadding"))));
             this.textBoxCity.Name = "textBoxCity";
             this.textBoxCity.ReadOnly = true;
-            this.textBoxCity.TextChanged += new System.EventHandler(this.TextBoxCity_TextChanged);
             // 
             // textBoxPostalCode
             // 
